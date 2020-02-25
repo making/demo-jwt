@@ -27,15 +27,21 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Component
 @ConfigurationProperties(prefix = "jwt")
 public class JwtService {
+
     private JWSSigner signer;
+
     private JWSVerifier verifier;
+
     private String keyId;
+
     private Resource signingKey;
+
     private Resource verifierKey;
 
     public String getKeyId() {
@@ -50,12 +56,12 @@ public class JwtService {
         this.signingKey = resource;
         final String key = resourceToString(resource);
         final byte[] decoded = Base64Utils.decodeFromString(key
-                .replace("fake", "")
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .trim()
-                .replace("\r\n", "")
-                .replace("\n", ""));
+            .replace("fake", "")
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .trim()
+            .replace("\r\n", "")
+            .replace("\n", ""));
         final EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
         final KeyFactory kf = KeyFactory.getInstance("RSA");
         final PrivateKey privateKey = kf.generatePrivate(keySpec);
@@ -76,9 +82,9 @@ public class JwtService {
 
     public SignedJWT sign(JWTClaimsSet claimsSet) {
         final JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256) //
-                .keyID(this.keyId)//
-                .type(JOSEObjectType.JWT) //
-                .build();
+            .keyID(this.keyId)//
+            .type(JOSEObjectType.JWT) //
+            .build();
         final SignedJWT signedJWT = new SignedJWT(header, claimsSet);
         try {
             signedJWT.sign(signer);
@@ -102,11 +108,11 @@ public class JwtService {
             return;
         }
         final String key = resourceToString(this.verifierKey)
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .trim()
-                .replace("\r\n", "")
-                .replace("\n", "");
+            .replace("-----BEGIN PUBLIC KEY-----", "")
+            .replace("-----END PUBLIC KEY-----", "")
+            .trim()
+            .replace("\r\n", "")
+            .replace("\n", "");
         final byte[] decode = Base64Utils.decodeFromString(key);
         final X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decode);
         final KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -116,7 +122,7 @@ public class JwtService {
         final SignedJWT signedJWT = sign(claimsSet);
         if (!signedJWT.verify(verifier)) {
             throw new IllegalStateException(
-                    "The pair of verifierKey and signingKey is wrong.");
+                "The pair of verifierKey and signingKey is wrong.");
         }
         this.verifier = verifier;
     }

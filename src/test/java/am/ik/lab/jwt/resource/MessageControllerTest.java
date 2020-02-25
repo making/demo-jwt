@@ -6,21 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.net.URI;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
-        "logging.level.ROOT=error",
-        "logging.level.org.springframework.web.client.RestTemplate=DEBUG"})
+    "logging.level.ROOT=error",
+    "logging.level.org.springframework.web.client.RestTemplate=DEBUG"})
 class MessageControllerTest {
+
     private final int port;
+
     private final TestRestTemplate restTemplate;
 
     MessageControllerTest(@LocalServerPort int port, @Autowired TestRestTemplate restTemplate) {
@@ -30,14 +35,15 @@ class MessageControllerTest {
 
     String login(String username, String password) {
         final RequestEntity<MultiValueMap<String, String>> req = RequestEntity.post(URI.create("http://localhost:" + port + "/oauth/token"))
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(new LinkedMultiValueMap<String, String>() {
-                    {
-                        add("username", username);
-                        add("password", password);
-                        add("grant_type", "password");
-                    }
-                });
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body(new LinkedMultiValueMap<String, String>() {
+
+                {
+                    add("username", username);
+                    add("password", password);
+                    add("grant_type", "password");
+                }
+            });
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         return res.getBody().get("access_token").asText();
@@ -53,8 +59,8 @@ class MessageControllerTest {
     void index_ok() {
         String accessToken = this.login("demo", "demo");
         RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .build();
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            .build();
         ResponseEntity<String> res = this.restTemplate.exchange(req, String.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getBody()).isEqualTo("Hello, demo!");
@@ -64,8 +70,8 @@ class MessageControllerTest {
     void message() {
         String accessToken = this.login("demo", "demo");
         RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/message"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .build();
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            .build();
         ResponseEntity<String> res = this.restTemplate.exchange(req, String.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getBody()).isEqualTo("secret message");
@@ -75,8 +81,8 @@ class MessageControllerTest {
     void createMessage() {
         String accessToken = this.login("demo", "demo");
         RequestEntity<?> req = RequestEntity.post(URI.create("http://localhost:" + port + "/message"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .body("Hello");
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            .body("Hello");
         ResponseEntity<String> res = this.restTemplate.exchange(req, String.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getBody()).isEqualTo("Message was created. Content: Hello");
