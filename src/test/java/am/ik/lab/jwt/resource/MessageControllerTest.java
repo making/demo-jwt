@@ -36,7 +36,7 @@ class MessageControllerTest {
     String login(String username, String password) {
         final RequestEntity<MultiValueMap<String, String>> req = RequestEntity.post(URI.create("http://localhost:" + port + "/oauth/token"))
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .body(new LinkedMultiValueMap<String, String>() {
+            .body(new LinkedMultiValueMap<>() {
 
                 {
                     add("username", username);
