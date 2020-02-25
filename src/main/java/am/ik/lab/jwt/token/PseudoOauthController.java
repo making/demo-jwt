@@ -34,7 +34,7 @@ public class PseudoOauthController {
     }
 
     @PostMapping(path = "oauth/token", params = "grant_type=password")
-    public Object token(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<?> token(@RequestParam("username") String username, @RequestParam("password") String password) {
         final Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
         try {
             this.authenticationManager.authenticate(authentication);
