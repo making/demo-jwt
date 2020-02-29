@@ -45,7 +45,7 @@ public class PseudoOauthController {
             final String issuer = ServletUriComponentsBuilder.fromCurrentRequest().build().toString();
             final Instant issuedAt = Instant.now();
             final Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
-            final Set<String> scope = Set.of("message:read", "message:write");
+            final Set<String> scope = Set.of("todo:read", "todo:write");
             final JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .issuer(issuer)
                     .expirationTime(Date.from(expiresAt))
