@@ -85,7 +85,7 @@ class TodoControllerTest {
     void getToDos_ok() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -112,7 +112,7 @@ class TodoControllerTest {
     void getToDo_ok() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos/" + this.toDo1.getToDoId()))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -131,7 +131,7 @@ class TodoControllerTest {
     void getToDo_notFound() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos/xxxxxxxxxx"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -141,7 +141,7 @@ class TodoControllerTest {
     void postToDos_created() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.post(URI.create("http://localhost:" + port + "/todos"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .body(Map.of("toDoTitle", "Demo"));
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -162,7 +162,7 @@ class TodoControllerTest {
     void putToDo_ok() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.put(URI.create("http://localhost:" + port + "/todos/" + this.toDo1.getToDoId()))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .body(Map.of("finished", true));
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -182,7 +182,7 @@ class TodoControllerTest {
     void putToDo_notFound() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.put(URI.create("http://localhost:" + port + "/todos/xxxxxxxxxx"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .body(Map.of("finished", true));
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -193,7 +193,7 @@ class TodoControllerTest {
         final String accessToken = this.login("demo", "demo");
         final String toDoId = this.toDo1.getToDoId();
         final RequestEntity<?> req = RequestEntity.delete(URI.create("http://localhost:" + port + "/todos/" + toDoId))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
