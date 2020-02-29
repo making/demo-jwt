@@ -20,7 +20,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: mvn package
+    - name: mvn test
       run: |
         set -e
         ./mvnw -V test
