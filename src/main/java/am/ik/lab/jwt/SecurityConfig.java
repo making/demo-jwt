@@ -16,8 +16,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests(authorizeRequests ->
                 authorizeRequests
                         .mvcMatchers("oauth/token").permitAll()
-                        .antMatchers(HttpMethod.GET, "message/**").hasAuthority("SCOPE_message:read")
-                        .antMatchers(HttpMethod.POST, "message/**").hasAuthority("SCOPE_message:write")
                         .antMatchers(HttpMethod.GET, "todos/**").hasAuthority("SCOPE_todo:read")
                         .antMatchers(HttpMethod.POST, "todos/**").hasAuthority("SCOPE_todo:write")
                         .antMatchers(HttpMethod.PUT, "todos/**").hasAuthority("SCOPE_todo:write")
