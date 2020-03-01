@@ -1,6 +1,6 @@
-# Demo Spring Security + JWT
+# Demo using JWT in Spring Security
 
-This app demonstrates standalone JWT authentication with Spring Security using [OAuth 2.0 Resource Server feature](https://docs.spring.io/spring-security/site/docs/5.2.2.RELEASE/reference/htmlsingle/#oauth2resourceserver).
+This app demonstrates standalone JWT authorization in Spring Security using [OAuth 2.0 Resource Server feature](https://docs.spring.io/spring-security/site/docs/5.2.2.RELEASE/reference/htmlsingle/#oauth2resourceserver).
 
 Actually it mimics OAuth2's Resource Owner Password Credentials flow.
 
