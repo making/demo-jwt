@@ -50,3 +50,16 @@ jobs:
         rm -f LICENSE NOTICE cf.tgz
         ./cf7 login -a ${CF_API} -u ${CF_USERNAME} -p ${CF_PASSWORD} -o ${CF_ORG} -s ${CF_SPACE}
         ./cf7 push --strategy rolling
+    - name: E2E test
+      if: github.ref == 'refs/heads/master'
+      env:
+        TARGET_URL: ${{ secrets.TARGET_URL }}
+      run: |
+        set -ex
+        ACCESS_TOKEN=$(curl -s ${TARGET_URL}/oauth/token -d grant_type=password -d username=demo -d password=demo | jq -r .access_token)
+        TODO_ID=$(curl -s ${TARGET_URL}/todos -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "Content-Type: application/json" -d '{"toDoTitle": "Demo"}' | jq -r .toDoId)
+        curl -s ${TARGET_URL}/todos -H "Authorization: Bearer ${ACCESS_TOKEN}"
+        curl -s ${TARGET_URL}/todos/${TODO_ID} -H "Authorization: Bearer ${ACCESS_TOKEN}"
+        curl -s -X PUT ${TARGET_URL}/todos/${TODO_ID} -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "Content-Type: application/json" -d '{"finished": "true"}'
+        curl -s -X DELETE ${TARGET_URL}/todos/${TODO_ID} -H "Authorization: Bearer ${ACCESS_TOKEN}"
+        curl -s ${TARGET_URL}/todos -H "Authorization: Bearer ${ACCESS_TOKEN}"        
