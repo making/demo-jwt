@@ -22,7 +22,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers(HttpMethod.DELETE, "todos/**").hasAuthority("SCOPE_todo:write")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(r -> r.jwt())
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable())
+                .cors();
     }
 
     @Override
