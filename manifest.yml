@@ -1,7 +1,7 @@
 applications:
 - name: demo-jwt
   instances: 1
-  memory: 256M
+  memory: 200M
   path: target/demo-jwt-0.0.1-SNAPSHOT.jar
   env:
     SERVER_TOMCAT_MAX_THREADS: 4
