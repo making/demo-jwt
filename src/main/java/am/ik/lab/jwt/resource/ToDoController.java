@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("todos")
+@CrossOrigin
 public class ToDoController {
     private final ToDoRepository toDoRepository;
 
