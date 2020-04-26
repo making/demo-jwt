@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER;
 
 @RestController
+@CrossOrigin
 public class PseudoOauthController {
 
     private final JwtService jwtService;
