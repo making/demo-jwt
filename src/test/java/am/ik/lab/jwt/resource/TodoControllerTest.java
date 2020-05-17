@@ -26,17 +26,17 @@ class TodoControllerTest {
 
     private final int port;
     private final TestRestTemplate restTemplate;
-    private final ToDoRepository toDoRepository;
-    private final ToDo toDo1 = new ToDo() {{
-        setToDoId(UUID.randomUUID().toString());
-        setToDoTitle("ToDo1");
+    private final TodoRepository todoRepository;
+    private final Todo todo1 = new Todo() {{
+        setTodoId(UUID.randomUUID().toString());
+        setTodoTitle("Todo1");
         setFinished(false);
         setCreatedAt(Instant.now());
         setCreatedBy("admin");
     }};
-    private final ToDo toDo2 = new ToDo() {{
-        setToDoId(UUID.randomUUID().toString());
-        setToDoTitle("ToDo2");
+    private final Todo todo2 = new Todo() {{
+        setTodoId(UUID.randomUUID().toString());
+        setTodoTitle("Todo2");
         setFinished(true);
         setCreatedAt(Instant.now());
         setCreatedBy("admin");
@@ -46,10 +46,10 @@ class TodoControllerTest {
 
     TodoControllerTest(@LocalServerPort int port,
                        @Autowired TestRestTemplate restTemplate,
-                       @Autowired ToDoRepository toDoRepository) {
+                       @Autowired TodoRepository todoRepository) {
         this.port = port;
         this.restTemplate = restTemplate;
-        this.toDoRepository = toDoRepository;
+        this.todoRepository = todoRepository;
     }
 
     String login(String username, String password) {
@@ -70,19 +70,19 @@ class TodoControllerTest {
 
     @BeforeEach
     void init() {
-        this.toDoRepository.clear();
-        this.toDoRepository.create(this.toDo1);
-        this.toDoRepository.create(this.toDo2);
+        this.todoRepository.clear();
+        this.todoRepository.create(this.todo1);
+        this.todoRepository.create(this.todo2);
     }
 
     @Test
-    void getToDos_unauthorized() {
+    void getTodos_unauthorized() {
         final ResponseEntity<String> res = this.restTemplate.getForEntity("/todos", String.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    void getToDos_ok() {
+    void getTodos_ok() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos"))
                 .headers(headers -> headers.setBearerAuth(accessToken))
@@ -92,15 +92,15 @@ class TodoControllerTest {
         final JsonNode body = res.getBody();
         assertThat(body).isNotNull();
         assertThat(body.size()).isEqualTo(2);
-        assertThat(body.get(0).get("toDoId").asText()).isEqualTo(this.toDo1.getToDoId());
-        assertThat(body.get(0).get("toDoTitle").asText()).isEqualTo("ToDo1");
+        assertThat(body.get(0).get("todoId").asText()).isEqualTo(this.todo1.getTodoId());
+        assertThat(body.get(0).get("todoTitle").asText()).isEqualTo("Todo1");
         assertThat(body.get(0).get("finished").asBoolean()).isFalse();
         assertThat(body.get(0).get("createdAt")).isNotNull();
         assertThat(body.get(0).get("createdBy").asText()).isEqualTo("admin");
         assertThat(body.get(0).get("updatedAt")).isNull();
         assertThat(body.get(0).get("updatedBy")).isNull();
-        assertThat(body.get(1).get("toDoId").asText()).isEqualTo(this.toDo2.getToDoId());
-        assertThat(body.get(1).get("toDoTitle").asText()).isEqualTo("ToDo2");
+        assertThat(body.get(1).get("todoId").asText()).isEqualTo(this.todo2.getTodoId());
+        assertThat(body.get(1).get("todoTitle").asText()).isEqualTo("Todo2");
         assertThat(body.get(1).get("finished").asBoolean()).isTrue();
         assertThat(body.get(1).get("createdAt")).isNotNull();
         assertThat(body.get(1).get("createdBy").asText()).isEqualTo("admin");
@@ -109,17 +109,17 @@ class TodoControllerTest {
     }
 
     @Test
-    void getToDo_ok() {
+    void getTodo_ok() {
         final String accessToken = this.login("demo", "demo");
-        final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos/" + this.toDo1.getToDoId()))
+        final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos/" + this.todo1.getTodoId()))
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         final JsonNode body = res.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.get("toDoId").asText()).isEqualTo(this.toDo1.getToDoId());
-        assertThat(body.get("toDoTitle").asText()).isEqualTo("ToDo1");
+        assertThat(body.get("todoId").asText()).isEqualTo(this.todo1.getTodoId());
+        assertThat(body.get("todoTitle").asText()).isEqualTo("Todo1");
         assertThat(body.get("finished").asBoolean()).isFalse();
         assertThat(body.get("createdAt")).isNotNull();
         assertThat(body.get("createdBy").asText()).isEqualTo("admin");
@@ -128,7 +128,7 @@ class TodoControllerTest {
     }
 
     @Test
-    void getToDo_notFound() {
+    void getTodo_notFound() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.get(URI.create("http://localhost:" + port + "/todos/xxxxxxxxxx"))
                 .headers(headers -> headers.setBearerAuth(accessToken))
@@ -138,39 +138,39 @@ class TodoControllerTest {
     }
 
     @Test
-    void postToDos_created() {
+    void postTodos_created() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.post(URI.create("http://localhost:" + port + "/todos"))
                 .headers(headers -> headers.setBearerAuth(accessToken))
-                .body(Map.of("toDoTitle", "Demo"));
+                .body(Map.of("todoTitle", "Demo"));
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         final JsonNode body = res.getBody();
         assertThat(body).isNotNull();
-        final String toDoId = body.get("toDoId").asText();
-        assertThat(toDoId).isNotNull();
-        assertThat(body.get("toDoTitle").asText()).isEqualTo("Demo");
+        final String todoId = body.get("todoId").asText();
+        assertThat(todoId).isNotNull();
+        assertThat(body.get("todoTitle").asText()).isEqualTo("Demo");
         assertThat(body.get("finished").asBoolean()).isFalse();
         assertThat(body.get("createdAt")).isNotNull();
         assertThat(body.get("createdBy").asText()).isEqualTo("demo");
         assertThat(body.get("updatedAt")).isNull();
         assertThat(body.get("updatedBy")).isNull();
-        assertThat(res.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:" + port + "/todos/" + toDoId));
+        assertThat(res.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:" + port + "/todos/" + todoId));
     }
 
     @Test
-    void putToDo_ok() {
+    void putTodo_ok() {
         final String accessToken = this.login("demo", "demo");
-        final RequestEntity<?> req = RequestEntity.put(URI.create("http://localhost:" + port + "/todos/" + this.toDo1.getToDoId()))
+        final RequestEntity<?> req = RequestEntity.put(URI.create("http://localhost:" + port + "/todos/" + this.todo1.getTodoId()))
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .body(Map.of("finished", true));
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         final JsonNode body = res.getBody();
         assertThat(body).isNotNull();
-        final String toDoId = body.get("toDoId").asText();
-        assertThat(toDoId).isNotNull();
-        assertThat(body.get("toDoTitle").asText()).isEqualTo("ToDo1");
+        final String todoId = body.get("todoId").asText();
+        assertThat(todoId).isNotNull();
+        assertThat(body.get("todoTitle").asText()).isEqualTo("Todo1");
         assertThat(body.get("finished").asBoolean()).isTrue();
         assertThat(body.get("createdAt")).isNotNull();
         assertThat(body.get("createdBy").asText()).isEqualTo("admin");
@@ -179,7 +179,7 @@ class TodoControllerTest {
     }
 
     @Test
-    void putToDo_notFound() {
+    void putTodo_notFound() {
         final String accessToken = this.login("demo", "demo");
         final RequestEntity<?> req = RequestEntity.put(URI.create("http://localhost:" + port + "/todos/xxxxxxxxxx"))
                 .headers(headers -> headers.setBearerAuth(accessToken))
@@ -189,14 +189,14 @@ class TodoControllerTest {
     }
 
     @Test
-    void deleteToDo_noContent() {
+    void deleteTodo_noContent() {
         final String accessToken = this.login("demo", "demo");
-        final String toDoId = this.toDo1.getToDoId();
-        final RequestEntity<?> req = RequestEntity.delete(URI.create("http://localhost:" + port + "/todos/" + toDoId))
+        final String todoId = this.todo1.getTodoId();
+        final RequestEntity<?> req = RequestEntity.delete(URI.create("http://localhost:" + port + "/todos/" + todoId))
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .build();
         final ResponseEntity<JsonNode> res = this.restTemplate.exchange(req, JsonNode.class);
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        assertThat(this.toDoRepository.findById(toDoId).isPresent()).isFalse();
+        assertThat(this.todoRepository.findById(todoId).isPresent()).isFalse();
     }
 }

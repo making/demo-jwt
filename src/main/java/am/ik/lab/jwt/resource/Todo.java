@@ -5,31 +5,31 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ToDo {
+public class Todo {
     private static final long serialVersionUID = 1L;
 
-    private String toDoId;
-    private String toDoTitle;
+    private String todoId;
+    private String todoTitle;
     private boolean finished = false;
     private Instant createdAt;
     private String createdBy;
     private Instant updatedAt;
     private String updatedBy;
 
-    public String getToDoId() {
-        return toDoId;
+    public String getTodoId() {
+        return todoId;
     }
 
-    public void setToDoId(String toDoId) {
-        this.toDoId = toDoId;
+    public void setTodoId(String todoId) {
+        this.todoId = todoId;
     }
 
-    public String getToDoTitle() {
-        return toDoTitle;
+    public String getTodoTitle() {
+        return todoTitle;
     }
 
-    public void setToDoTitle(String toDoTitle) {
-        this.toDoTitle = toDoTitle;
+    public void setTodoTitle(String todoTitle) {
+        this.todoTitle = todoTitle;
     }
 
     public boolean isFinished() {
