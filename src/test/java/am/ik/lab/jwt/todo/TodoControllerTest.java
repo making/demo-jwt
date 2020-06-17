@@ -1,4 +1,4 @@
-package am.ik.lab.jwt.resource;
+package am.ik.lab.jwt.todo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
