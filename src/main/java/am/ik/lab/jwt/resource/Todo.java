@@ -3,6 +3,8 @@ package am.ik.lab.jwt.resource;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Todo {
@@ -15,6 +17,25 @@ public class Todo {
     private String createdBy;
     private Instant updatedAt;
     private String updatedBy;
+
+    public Todo initializedBy(String createdBy) {
+        this.setTodoId(UUID.randomUUID().toString());
+        this.setCreatedAt(Instant.now());
+        this.setCreatedBy(createdBy);
+        return this;
+    }
+
+    public Todo updatedBy(String todoTitle, boolean finished, String updatedBy) {
+        if (todoTitle != null) {
+            this.setTodoTitle(todoTitle);
+        }
+        if (!Objects.equals(finished, this.isFinished())) {
+            this.setFinished(finished);
+        }
+        this.setUpdatedAt(Instant.now());
+        this.setUpdatedBy(updatedBy);
+        return this;
+    }
 
     public String getTodoId() {
         return todoId;

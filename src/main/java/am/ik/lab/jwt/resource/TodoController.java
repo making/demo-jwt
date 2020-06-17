@@ -7,11 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("todos")
@@ -37,10 +34,8 @@ public class TodoController {
 
     @PostMapping(path = "")
     public ResponseEntity<Todo> postTodos(@RequestBody Todo todo, @AuthenticationPrincipal Jwt jwt, UriComponentsBuilder builder) {
-        todo.setTodoId(UUID.randomUUID().toString());
-        todo.setCreatedAt(Instant.now());
-        todo.setCreatedBy(jwt.getSubject());
-        final Todo created = this.todoRepository.create(todo);
+        final Todo initialized = todo.initializedBy(jwt.getSubject());
+        final Todo created = this.todoRepository.create(initialized);
         final URI uri = builder.pathSegment("todos", created.getTodoId()).build().toUri();
         return ResponseEntity.created(uri).body(created);
     }
@@ -48,17 +43,8 @@ public class TodoController {
     @PutMapping(path = "/{todoId}")
     public ResponseEntity<Todo> putTodo(@PathVariable("todoId") String todoId, @RequestBody Todo todo, @AuthenticationPrincipal Jwt jwt) {
         final Optional<Todo> updated = this.todoRepository.findById(todoId)
-                .map(t -> {
-                    if (todo.getTodoTitle() != null) {
-                        t.setTodoTitle(todo.getTodoTitle());
-                    }
-                    if (!Objects.equals(todo.isFinished(), t.isFinished())) {
-                        t.setFinished(todo.isFinished());
-                    }
-                    t.setUpdatedAt(Instant.now());
-                    t.setUpdatedBy(jwt.getSubject());
-                    return this.todoRepository.updateById(t);
-                });
+                .map(t -> t.updatedBy(todo.getTodoTitle(), todo.isFinished(), jwt.getSubject()))
+                .map(this.todoRepository::updateById);
         return ResponseEntity.of(updated);
     }
 
