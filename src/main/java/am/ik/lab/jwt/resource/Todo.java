@@ -22,6 +22,8 @@ public class Todo {
         this.setTodoId(UUID.randomUUID().toString());
         this.setCreatedAt(Instant.now());
         this.setCreatedBy(createdBy);
+        this.setUpdatedAt(this.getCreatedAt());
+        this.setUpdatedBy(this.getCreatedBy());
         return this;
     }
 

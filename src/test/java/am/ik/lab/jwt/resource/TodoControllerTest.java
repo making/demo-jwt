@@ -153,8 +153,8 @@ class TodoControllerTest {
         assertThat(body.get("finished").asBoolean()).isFalse();
         assertThat(body.get("createdAt")).isNotNull();
         assertThat(body.get("createdBy").asText()).isEqualTo("demo");
-        assertThat(body.get("updatedAt")).isNull();
-        assertThat(body.get("updatedBy")).isNull();
+        assertThat(body.get("updatedAt")).isNotNull();
+        assertThat(body.get("updatedBy").asText()).isEqualTo("demo");
         assertThat(res.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:" + port + "/todos/" + todoId));
     }
 
